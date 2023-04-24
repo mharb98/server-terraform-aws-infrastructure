@@ -13,6 +13,7 @@ resource "aws_cloudfront_cache_policy" "alb-cache-policy" {
     query_strings_config {
       query_string_behavior = "all"
     }
+
   }
 }
 
