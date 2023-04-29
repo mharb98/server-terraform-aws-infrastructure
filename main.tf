@@ -29,6 +29,46 @@ resource "aws_lb_target_group" "production-target-group" {
   vpc_id   = module.prod-vpc.vpc_id
 }
 
+resource "aws_security_group" "bastion-sg" {
+  name        = "bastion-hosts-security-group"
+  description = "Allow SSH traffic from the internet"
+  vpc_id      = module.prod-vpc.vpc_id
+  ingress {
+    description      = "SSH traffic from anywhere"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    # security_groups = [var.alb_security_group]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_instance" "bastion-host" {
+  ami             = "ami-0b7fd829e7758b06d" # us-west-2
+  instance_type   = "t2.micro"
+  security_groups = [aws_security_group.bastion-sg.id]
+  # vpc_id          = module.
+  subnet_id = module.prod-vpc.vpc_public_subnets[0]
+  # key_name = 
+  #   network_interface {
+  #     network_interface_id = aws_network_interface.foo.id
+  #     device_index         = 0
+  #   }
+
+  #   credit_specification {
+  #     cpu_credits = "unlimited"
+  #   }
+}
+
 module "prod-secrets-manager" {
   source = "./modules/secrets"
 
