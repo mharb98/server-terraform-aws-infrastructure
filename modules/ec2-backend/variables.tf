@@ -25,3 +25,7 @@ variable "alb_security_group" {
 variable "tg_arn" {
   type = string
 }
+
+variable "security_group_id" {
+  type = string
+}

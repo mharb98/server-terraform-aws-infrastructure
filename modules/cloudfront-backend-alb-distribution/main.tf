@@ -50,8 +50,4 @@ resource "aws_cloudfront_distribution" "production-cf-backend-distribution" {
     # ssl_support_method       = "sni-only"
     # minimum_protocol_version = "TLSv1.2_2018"
   }
-
-  # tags {
-  #   Name = "${var.environment}-${var.app_name}-backend-distribution"
-  # }
 }

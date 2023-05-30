@@ -10,30 +10,6 @@ resource "aws_placement_group" "placement-group" {
   spread_level = "rack"
 }
 
-resource "aws_security_group" "security-group" {
-  name        = "${var.environment}-${var.app_name}-security-group"
-  description = "Allow HTTP traffic from alb"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    description = "HTTP traffic from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    # cidr_blocks      = ["0.0.0.0/0"]
-    # ipv6_cidr_blocks = ["::/0"]
-    security_groups = [var.alb_security_group]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-}
-
 resource "aws_launch_template" "launch_template" {
   name = "${var.environment}-${var.app_name}-launch-template"
 
@@ -49,16 +25,20 @@ resource "aws_launch_template" "launch_template" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups             = [aws_security_group.security-group.id]
+    security_groups             = [var.security_group_id]
   }
 
   user_data = filebase64("${path.module}/user-data.sh")
+
+  tags = {
+    Name = "production-${var.app_name}"
+  }
 }
 
 resource "aws_autoscaling_group" "asg" {
   name                = "${var.environment}-${var.app_name}-asg"
   max_size            = 3
-  min_size            = 1
+  min_size            = 0
   desired_capacity    = 2
   force_delete        = true
   placement_group     = aws_placement_group.placement-group.id
