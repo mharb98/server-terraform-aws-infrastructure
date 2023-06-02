@@ -36,7 +36,7 @@ resource "aws_instance" "production-bastion-host" {
   key_name                    = "ec2-key-pair"
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.production-bastion-sg.id]
-  subnet_id                   = data.terraform_remote_state.vpc.outputs.vpc_public_subnets[0]
+  subnet_id                   = data.terraform_remote_state.vpc.outputs.vpc_public_subnets[1]
   associate_public_ip_address = true
 
   tags = {

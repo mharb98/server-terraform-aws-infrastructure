@@ -6,8 +6,8 @@ provider "aws" {
 
 # Create a vpc
 resource "aws_vpc" "vpc" {
-  cidr_block = var.vpc_cidr_block
-
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_hostnames = true
   tags = {
     Name = "${var.environment}-vpc"
   }
@@ -52,7 +52,7 @@ resource "aws_internet_gateway" "internet_gw" {
 
 # Only 1 eip will be created to reduce the cost during development
 resource "aws_eip" "nat_eip" {
-  vpc = true
+  domain = "vpc"
 }
 
 # Will create only 1 nat gw to reduce the cost of eip
