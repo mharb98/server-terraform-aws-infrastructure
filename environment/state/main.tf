@@ -11,14 +11,16 @@ resource "aws_kms_alias" "key-alias" {
 }
 
 resource "aws_s3_bucket" "terraform-state" {
-  bucket = "marwan-harb-s3-terraform-state-backend"
+  bucket = "marwan-s3-terraform-state-backend"
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = aws_kms_key.terraform-bucket-key.arn
-        sse_algorithm     = "aws:kms"
-      }
+# resource for s3 backend encrypyion rule
+resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
+  bucket = aws_s3_bucket.terraform-state.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.terraform-bucket-key.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }

@@ -1,5 +1,5 @@
 locals {
-  environment = "application"
+  environment = "production"
   app_name    = "demo"
 }
 
