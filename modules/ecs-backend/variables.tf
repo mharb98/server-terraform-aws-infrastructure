@@ -32,3 +32,8 @@ variable "ecs_task_execution_role_arn" {
   description = "IAM ecs task execution role"
   type        = string
 }
+
+variable "task_role_arn" {
+  description = "IAM role that will be attached to the services spin up by the task definition"
+  type        = string
+}
