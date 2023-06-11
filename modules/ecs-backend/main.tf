@@ -3,13 +3,13 @@ provider "aws" {
 }
 
 # The repository from which the ecs services will pull the image
-resource "aws_ecr_repository" "repository" {
-  name = "ecs-${var.environment}-${var.app_name}"
+# resource "aws_ecr_repository" "repository" {
+#   name = "ecs-${var.environment}-${var.app_name}"
 
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+#   image_scanning_configuration {
+#     scan_on_push = true
+#   }
+# }
 
 # The cluster that will hold the task definitions and services
 resource "aws_ecs_cluster" "aws-ecs-cluster" {
@@ -22,15 +22,21 @@ resource "aws_ecs_cluster" "aws-ecs-cluster" {
 
 # The template from which the services will be created
 resource "aws_ecs_task_definition" "aws-ecs-task" {
-  family = "${var.app_name}-task"
+  family                   = "${var.app_name}-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  memory                   = "512"
+  cpu                      = "256"
+  execution_role_arn       = var.ecs_task_execution_role_arn
+  # task_role_arn            = var.ecs_task_execution_role_arn
 
   container_definitions = jsonencode([
     {
       "name" : "${var.app_name}-${var.environment}-container",
       "image" : "nginx:latest",
       "entryPoint" : [],
-      #   "environment": ${data.template_file.env_vars.rendered},
       "essential" : true,
+      #   "environment": ${data.template_file.env_vars.rendered},
       "portMappings" : [
         {
           "containerPort" : 80,
@@ -42,18 +48,6 @@ resource "aws_ecs_task_definition" "aws-ecs-task" {
       "networkMode" : "awsvpc"
     }
   ])
-
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  memory                   = "512"
-  cpu                      = "256"
-  # execution_role_arn       = var.ecs_task_execution_role_arn
-  # task_role_arn            = var.ecs_task_execution_role_arn
-
-  tags = {
-    Name        = "${var.app_name}-ecs-td"
-    Environment = var.environment
-  }
 }
 
 data "aws_ecs_task_definition" "main" {
@@ -65,9 +59,9 @@ resource "aws_ecs_service" "aws-ecs-service" {
   name                 = "${var.app_name}-${var.environment}-ecs-service"
   cluster              = aws_ecs_cluster.aws-ecs-cluster.id
   task_definition      = "${aws_ecs_task_definition.aws-ecs-task.family}:${max(aws_ecs_task_definition.aws-ecs-task.revision, data.aws_ecs_task_definition.main.revision)}"
+  desired_count        = 1
   launch_type          = "FARGATE"
   scheduling_strategy  = "REPLICA"
-  desired_count        = 1
   force_new_deployment = true
 
   network_configuration {

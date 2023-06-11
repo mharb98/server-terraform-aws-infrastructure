@@ -28,7 +28,7 @@ variable "service_security_group_id" {
   type        = string
 }
 
-# variable "ecs_task_execution_role_arn" {
-#   description = "IAM ecs task execution role"
-#   type        = string
-# }
+variable "ecs_task_execution_role_arn" {
+  description = "IAM ecs task execution role"
+  type        = string
+}
