@@ -1,11 +1,16 @@
-# variable "repository_name" {
-#   description = "Name of the repository from which ecs will read the container"
-#   type        = string
-# }
+variable "repository_name" {
+  description = "Name of the repository from which ecs will read the container"
+  type        = string
+}
 
 variable "app_name" {
   description = "Name of the application for which the cluster is made"
   type        = string
+}
+
+variable "port" {
+  description = "Port that will host the application"
+  type        = number
 }
 
 variable "environment" {

@@ -33,14 +33,16 @@ resource "aws_ecs_task_definition" "aws-ecs-task" {
   container_definitions = jsonencode([
     {
       "name" : "${var.app_name}-${var.environment}-container",
-      "image" : "nginx:latest",
+      "image" : "${var.repository_name}",
       "entryPoint" : [],
       "essential" : true,
-      #   "environment": ${data.template_file.env_vars.rendered},
+      "environment" : [
+        { "name" : "DATABASE_URL", "value" : "postgresql://postgres:marwan12@terraform-20230720203252116300000001.cgvxclvmavlm.eu-central-1.rds.amazonaws.com:5432/to_do_app?schema=public" }
+      ],
       "portMappings" : [
         {
-          "containerPort" : 80,
-          "hostPort" : 80
+          "containerPort" : var.port,
+          "hostPort" : var.port
         }
       ],
       "cpu" : 256,
@@ -75,6 +77,6 @@ resource "aws_ecs_service" "aws-ecs-service" {
   load_balancer {
     target_group_arn = var.alb_tg_arn
     container_name   = "${var.app_name}-${var.environment}-container"
-    container_port   = 80
+    container_port   = var.port
   }
 }

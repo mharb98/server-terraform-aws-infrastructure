@@ -6,8 +6,8 @@ locals {
 data "terraform_remote_state" "external-alb" {
   backend = "s3"
   config = {
-    bucket = "marwan-harb-s3-terraform-state-backend"
-    key    = "production/02-external-alb/terraform.tfstate"
+    bucket = "marwan-s3-terraform-state-backend"
+    key    = "production/00-infrastructure/02-external-alb/terraform.tfstate"
     region = "eu-central-1"
   }
 }

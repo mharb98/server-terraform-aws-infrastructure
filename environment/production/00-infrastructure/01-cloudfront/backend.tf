@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket         = "marwan-harb-s3-terraform-state-backend"
-    key            = "production/01-application/01-cloudfront/terraform.tfstate"
+    bucket         = "marwan-s3-terraform-state-backend"
+    key            = "production/00-infrastructure/01-cloudfront/terraform.tfstate"
     region         = "eu-central-1"
     encrypt        = true
-    kms_key_id     = "75eeba81-1e8f-45f4-94ef-4eb3c77c8faf"
+    kms_key_id     = "39405ab6-d9af-449b-a65b-33c1afed10c6"
     dynamodb_table = "terraform-state"
   }
 }

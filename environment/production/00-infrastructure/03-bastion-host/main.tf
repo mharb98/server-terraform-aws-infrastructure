@@ -5,8 +5,8 @@ locals {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "marwan-harb-s3-terraform-state-backend"
-    key    = "production/00-vpc/terraform.tfstate"
+    bucket = "marwan-s3-terraform-state-backend"
+    key    = "production/00-infrastructure/00-vpc/terraform.tfstate"
     region = "eu-central-1"
   }
 }
