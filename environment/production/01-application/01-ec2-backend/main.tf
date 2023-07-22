@@ -36,6 +36,17 @@ resource "aws_lb_target_group" "target-group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.terraform_remote_state.vpc.outputs.vpc_id
+
+  health_check {
+    enabled             = true
+    interval            = 60
+    matcher             = 200
+    path                = "/"
+    port                = 80
+    protocol            = "http"
+    timeout             = 30
+    unhealthy_threshold = 5
+  }
 }
 
 resource "aws_lb_listener" "http-listener" {
