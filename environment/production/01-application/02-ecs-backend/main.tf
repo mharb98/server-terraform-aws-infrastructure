@@ -28,17 +28,37 @@ resource "aws_lb_target_group" "target-group" {
   protocol    = "HTTP"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
   target_type = "ip"
+
+  health_check {
+    enabled             = true
+    interval            = 60
+    matcher             = 200
+    path                = "/"
+    port                = 3000
+    protocol            = "HTTP"
+    timeout             = 30
+    unhealthy_threshold = 5
+  }
 }
 
-resource "aws_lb_listener" "http-listener" {
-  load_balancer_arn = data.terraform_remote_state.external-alb.outputs.alb-id
-  port              = "80"
-  protocol          = "HTTP"
+resource "aws_lb_listener_rule" "ec2-backend-listener-rule" {
+  listener_arn = data.terraform_remote_state.external-alb.outputs.alb-http-listener-arn
 
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target-group.arn
   }
+
+  condition {
+    host_header {
+      values = ["d3qv49vpk4tz7n.cloudfront.net*"]
+    }
+  }
+}
+
+# Log group to check for failing ecs
+resource "aws_cloudwatch_log_group" "ecs-logs" {
+  name = "ecs-to-do-app-logs"
 }
 
 # ECS configurations
@@ -124,15 +144,9 @@ resource "aws_security_group" "ecs_task_sg" {
   name   = "${local.environment}-${local.app_name}-ecs-task-sg"
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 3000
+    to_port         = 3000
     protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.external-alb.outputs.alb-security-group-id]
-  }
-  ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
     security_groups = [data.terraform_remote_state.external-alb.outputs.alb-security-group-id]
   }
   egress {
@@ -147,14 +161,15 @@ resource "aws_security_group" "ecs_task_sg" {
 # Defining the ecs module
 module "ecs-backend" {
   source                      = "../../../../modules/ecs-backend"
-  app_name                    = "demo"
+  app_name                    = "to-do-app"
   repository_name             = "marwanharb98/to-do-app"
   container_port              = 3000
-  host_port                   = 80
+  host_port                   = 3000
   environment                 = "production"
   subnets                     = data.terraform_remote_state.vpc.outputs.vpc_private_subnets
   alb_tg_arn                  = aws_lb_target_group.target-group.arn
   service_security_group_id   = aws_security_group.ecs_task_sg.id
   ecs_task_execution_role_arn = aws_iam_role.ecs-task-execution-role.arn
   task_role_arn               = aws_iam_role.ecs-task-role.arn
+  cloudwatch_group            = aws_cloudwatch_log_group.ecs-logs.name
 }

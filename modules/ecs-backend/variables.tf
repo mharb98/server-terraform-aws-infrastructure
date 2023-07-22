@@ -46,3 +46,8 @@ variable "task_role_arn" {
   description = "IAM role that will be attached to the services spin up by the task definition"
   type        = string
 }
+
+variable "cloudwatch_group" {
+  description = "Log group for ecs tasks"
+  type = string
+}

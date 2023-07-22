@@ -11,14 +11,14 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-# data "terraform_remote_state" "ecs-backend" {
-#   backend = "s3"
-#   config = {
-#     bucket = "marwan-s3-terraform-state-backend"
-#     key    = "production/01-application/02-ecs-backend/terraform.tfstate"
-#     region = "eu-central-1"
-#   }
-# }
+data "terraform_remote_state" "ecs-backend" {
+  backend = "s3"
+  config = {
+    bucket = "marwan-s3-terraform-state-backend"
+    key    = "production/01-application/02-ecs-backend/terraform.tfstate"
+    region = "eu-central-1"
+  }
+}
 
 
 data "terraform_remote_state" "ec2-backend" {
@@ -47,11 +47,14 @@ resource "aws_security_group" "db-security-group" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   ingress {
-    description     = "Allow traffic from all ips mainly (ec2/bastion-hosts)"
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.ec2-backend.outputs.ec2-security-group-id, data.terraform_remote_state.bastion-host.outputs.security_group_id]
+    description = "Allow traffic from all ips mainly (ec2/bastion-hosts)"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [
+      data.terraform_remote_state.ec2-backend.outputs.ec2-security-group-id,
+      data.terraform_remote_state.bastion-host.outputs.security_group_id,
+    data.terraform_remote_state.ecs-backend.outputs.security_group_id]
   }
 }
 
