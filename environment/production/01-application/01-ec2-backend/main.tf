@@ -91,24 +91,24 @@ resource "aws_lb_target_group" "target-group" {
   }
 }
 
-resource "aws_lb_listener" "http-listener" {
-  load_balancer_arn = data.terraform_remote_state.external-alb.outputs.alb-id
-  port              = "80"
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "http-listener" {
+#   load_balancer_arn = data.terraform_remote_state.external-alb.outputs.alb-id
+#   port              = "80"
+#   protocol          = "HTTP"
 
-  default_action {
-    type = "redirect"
+#   default_action {
+#     type = "redirect"
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
 
 resource "aws_lb_listener_rule" "ec2-backend-listener-rule" {
-  listener_arn = aws_lb_listener.http-listener.arn
+  listener_arn = data.terraform_remote_state.external-alb.outputs.alb-http-listener-arn
 
   action {
     type             = "forward"

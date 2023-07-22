@@ -42,3 +42,20 @@ resource "aws_lb" "alb" {
   subnets                          = data.terraform_remote_state.vpc.outputs.vpc_public_subnets
   enable_cross_zone_load_balancing = true
 }
+
+
+resource "aws_lb_listener" "http-listener" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
