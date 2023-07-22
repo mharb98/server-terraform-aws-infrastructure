@@ -22,6 +22,10 @@ resource "aws_launch_template" "launch_template" {
     enabled = true
   }
 
+  iam_instance_profile {
+    name = var.iam_role_name
+  }
+
   network_interfaces {
     associate_public_ip_address = true
     security_groups             = [var.security_group_id]

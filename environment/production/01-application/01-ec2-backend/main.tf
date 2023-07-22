@@ -30,6 +30,48 @@ data "terraform_remote_state" "external-alb" {
   }
 }
 
+# AWS managed policy to attach to ec2-iam-role to read from secrets manager
+data "aws_iam_policy" "secrets-manager-policy" {
+  arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
+# IAM role with permission to access secrets manager
+resource "aws_iam_role" "ec2-iam-role" {
+  name = "ec2-iam-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+# Attach the policy for secrets manager to the new role
+resource "aws_iam_role_policy_attachment" "sto-readonly-role-policy-attach" {
+  role       = aws_iam_role.ec2-iam-role.name
+  policy_arn = data.aws_iam_policy.secrets-manager-policy.arn
+}
+
+# Instance profile to be attached to ec2
+resource "aws_iam_instance_profile" "ec2-iam-instance-profile" {
+  name = "ec2-iam-instance-profile"
+  role = aws_iam_role.ec2-iam-role.name
+}
+
+# Defining the secrets manager
+resource "aws_secretsmanager_secret" "example" {
+  name = "to-do-app-secrets"
+}
+
+
+
 # External ALB target group
 resource "aws_lb_target_group" "target-group" {
   name     = "${local.app_name}-${local.environment}-tg-alb"
@@ -102,4 +144,5 @@ module "prod-ec2-backend" {
   alb_security_group = data.terraform_remote_state.external-alb.outputs.alb-id
   tg_arn             = aws_lb_target_group.target-group.arn
   security_group_id  = aws_security_group.ec2-security-group.id
+  iam_role_name      = aws_iam_instance_profile.ec2-iam-instance-profile.name
 }

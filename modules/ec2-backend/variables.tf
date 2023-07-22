@@ -29,3 +29,7 @@ variable "tg_arn" {
 variable "security_group_id" {
   type = string
 }
+
+variable "iam_role_name" {
+  type = string
+}
