@@ -16,6 +16,7 @@ resource "aws_launch_template" "launch_template" {
   instance_initiated_shutdown_behavior = "terminate"
 
   instance_type = "t2.micro"
+  key_name      = "ec2-key-pair"
 
   monitoring {
     enabled = true
@@ -41,13 +42,6 @@ resource "aws_autoscaling_group" "asg" {
   force_delete        = true
   placement_group     = aws_placement_group.placement-group.id
   vpc_zone_identifier = var.subnet_ids
-
-  # initial_lifecycle_hook {
-  #   name                 = "lifcycle-hook"
-  #   default_result       = "CONTINUE"
-  #   heartbeat_timeout    = 2000
-  #   lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-  # }
 
   launch_template {
     id      = aws_launch_template.launch_template.id

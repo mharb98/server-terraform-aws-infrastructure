@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket         = "marwan-harb-s3-terraform-state-backend"
+    bucket         = "marwan-s3-terraform-state-backend"
     key            = "production/01-application/01-ec2-backend/terraform.tfstate"
     region         = "eu-central-1"
     encrypt        = true

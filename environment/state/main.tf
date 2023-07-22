@@ -5,10 +5,10 @@ resource "aws_kms_key" "terraform-bucket-key" {
   enable_key_rotation     = true
 }
 
-resource "aws_kms_alias" "key-alias" {
-  name          = "alias/terraform-state-key"
-  target_key_id = aws_kms_key.terraform-bucket-key.key_id
-}
+# resource "aws_kms_alias" "key-alias" {
+#   name          = "alias/terraform-state-key"
+#   target_key_id = aws_kms_key.terraform-bucket-key.key_id
+# }
 
 resource "aws_s3_bucket" "terraform-state" {
   bucket = "marwan-s3-terraform-state-backend"

@@ -33,7 +33,6 @@ resource "aws_cloudfront_cache_policy" "alb-cache-policy" {
 
 resource "aws_cloudfront_distribution" "demo-backend-distribution" {
   enabled = true
-  # aliases = [var.domain_name]
   origin {
     domain_name = data.terraform_remote_state.external-alb.outputs.alb-dns-name
     origin_id   = data.terraform_remote_state.external-alb.outputs.alb-id
@@ -59,9 +58,5 @@ resource "aws_cloudfront_distribution" "demo-backend-distribution" {
   }
   viewer_certificate {
     cloudfront_default_certificate = true
-
-    # acm_certificate_arn      = aws_acm_certificate.cert.arn
-    # ssl_support_method       = "sni-only"
-    # minimum_protocol_version = "TLSv1.2_2018"
   }
 }
