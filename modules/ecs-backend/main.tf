@@ -41,8 +41,8 @@ resource "aws_ecs_task_definition" "aws-ecs-task" {
       ],
       "portMappings" : [
         {
-          "containerPort" : var.port,
-          "hostPort" : var.port
+          "containerPort" : var.container_port,
+          "hostPort" : var.host_port
         }
       ],
       "cpu" : 256,
@@ -77,6 +77,6 @@ resource "aws_ecs_service" "aws-ecs-service" {
   load_balancer {
     target_group_arn = var.alb_tg_arn
     container_name   = "${var.app_name}-${var.environment}-container"
-    container_port   = var.port
+    container_port   = var.host_port
   }
 }

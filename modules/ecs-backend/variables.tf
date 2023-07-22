@@ -8,11 +8,15 @@ variable "app_name" {
   type        = string
 }
 
-variable "port" {
-  description = "Port that will host the application"
+variable "container_port" {
+  description = "Port inside the container"
   type        = number
 }
 
+variable "host_port" {
+  description = "Port that will host the application"
+  type        = number
+}
 variable "environment" {
   description = "Environment on which the application will be deployed e.g (testing/staging/production)"
   type        = string

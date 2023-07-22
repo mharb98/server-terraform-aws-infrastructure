@@ -97,8 +97,28 @@ resource "aws_lb_listener" "http-listener" {
   protocol          = "HTTP"
 
   default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "ec2-backend-listener-rule" {
+  listener_arn = aws_lb_listener.http-listener.arn
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target-group.arn
+  }
+
+  condition {
+    host_header {
+      values = ["d268s3grzy7dt.cloudfront.net*"]
+    }
   }
 }
 

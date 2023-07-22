@@ -149,7 +149,8 @@ module "ecs-backend" {
   source                      = "../../../../modules/ecs-backend"
   app_name                    = "demo"
   repository_name             = "marwanharb98/to-do-app"
-  port                        = 3000
+  container_port              = 3000
+  host_port                   = 80
   environment                 = "production"
   subnets                     = data.terraform_remote_state.vpc.outputs.vpc_private_subnets
   alb_tg_arn                  = aws_lb_target_group.target-group.arn

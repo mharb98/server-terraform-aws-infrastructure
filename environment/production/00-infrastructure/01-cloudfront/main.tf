@@ -22,7 +22,10 @@ resource "aws_cloudfront_cache_policy" "alb-cache-policy" {
       cookie_behavior = "all"
     }
     headers_config {
-      header_behavior = "none"
+      header_behavior = "whitelist"
+      headers {
+        items = ["host", "host_header"]
+      }
     }
     query_strings_config {
       query_string_behavior = "all"
